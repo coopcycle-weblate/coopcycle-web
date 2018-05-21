@@ -12,6 +12,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Psr\Log\LoggerInterface;
 
 class Me
 {
@@ -19,10 +21,11 @@ class Me
 
     protected $doctrine;
 
-    public function __construct(TokenStorageInterface $tokenStorage, DoctrineRegistry $doctrine)
+    public function __construct(TokenStorageInterface $tokenStorage, DoctrineRegistry $doctrine, LoggerInterface $logger)
     {
         $this->tokenStorage = $tokenStorage;
         $this->doctrine = $doctrine;
+        $this->logger = $logger;
     }
 
     /**
@@ -91,5 +94,24 @@ class Me
     public function meAction()
     {
         return $this->getUser();
+    }
+
+    /**
+     * @Route(path="/me/location", name="me_location")
+     * @Method("POST")
+     */
+    public function locationAction(Request $request)
+    {
+        $data = [];
+        $content = $request->getContent();
+        if (!empty($content)) {
+            $data = json_decode($content, true);
+        }
+
+        foreach ($data as $location) {
+            // TODO Store location
+        }
+
+        return new JsonResponse([]);
     }
 }
